@@ -7,6 +7,7 @@ HYPHENATE provides a function to hyphenate words. HYPHENATE takes the word, and 
 
 ### Examples ###
 
+```
 >> hyphenate('hyphenation')
 ans =
     'hy'    'phen'    'a'    'tion'
@@ -18,3 +19,4 @@ ans =
 >> hyphenate('project')
 ans =
     'project'
+```
