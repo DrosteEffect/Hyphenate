@@ -43,9 +43,9 @@ function parts = hyphenate(word)
 %
 % See Also CHAR CELLSTR FPRINTF SPRINTF TEXT TITLE REGEXP IREGEXP ISSTRPROP
 
-persistent exs exw tree
+persistent exs exw trie
 %
-if isempty(tree)
+if isempty(trie)
     % Add your own exceptions here:
     uxc = {};
     % Exceptions from Ned Batchelder:
@@ -60,8 +60,8 @@ if isempty(tree)
     [~,idu] = unique(lower(exw),'first');
     exw = exw(idu);
     exs = exs(idu);
-    % Build hyphenation patterns tree:
-    tree = hMakeTree(horzcat(hLiangPatterns(),hKuikenPatterns()));
+    % Build hyphenation patterns trie:
+    trie = hMakeTrie(horzcat(hLiangPatterns(),hKuikenPatterns()));
 end
 %
 assert(ischar(word)&&isrow(word),'Input must be a 1xN char (string).')
@@ -78,7 +78,7 @@ else
     pts = zeros(1,1+numel(wrk));
     %
     for ii = 1:numel(wrk)
-        t = tree;
+        t = trie;
         for c = wrk(ii:end)
             fld = ['C',c];
             if isfield(t,fld)
@@ -126,19 +126,19 @@ function ptc = hKuikenPatterns()
 ptc = {'_con5gr','_de5riva','_dri5v4','_eth1y6l1','_eu4ler','_ev2','_ever5si5b','_ga4s1om1','_ge4ome','_ge5ot1','_he3mo1','_he3p6a','_he3roe','_in5u2t','_kil2n3i','_ko6r1te1','_le6ices','_me4ga1l','_met4ala','_mim5i2c1','_mi1s4ers','_ne6o3f','_noe1th','_non1e2m','_poly1s','_post1am','_pre1am','_rav5en1o','_semi5','_sem4ic','_semid6','_semip4','_semir4','_sem6is4','_semiv4','_sph6in1','_spin1o','_ta5pes1tr','_te3legr','_to6pog','_to2q','_un3at5t','_un5err5','_vi2c3ar','_we2b1l','_re1e4c','a5bolic','a2cabl','af6fish','am1en3ta5b','anal6ys','ano5a2c','ans5gr','ans3v','anti1d','an3ti1n2','anti1re','a4pe5able','ar3che5t','ar2range','as5ymptot','ath3er1o1s','at6tes_','augh4tl','au5li5f','av3iou','back2er_','ba6r1onie','ba1thy','bbi4t','be2vie','bi5d2if','bil2lab','bio5m','bi1orb','bio1rh','b1i3tive','blan2d1','blin2d1','blon2d2','bor1no5','bo2t1u1l','brus4q','bus6i2er','bus6i2es','buss4ing','but2ed_','but4ted','cad5e1m','cat1a1s2','4chs_','chs3hu','chie5vo','cig3a3r','cin2q','cle4ar','co6ph1o3n','cous2ti','cri3tie','croc1o1d','cro5e2co','c2tro3me6c','1cu2r1ance','2d3alone','data1b','dd5a5b','d2d5ib','de4als_','de5clar1','de2c5lina','de3fin3iti','de2mos','des3ic','de2tic','dic1aid','dif5fra','3di1methy','di2ren','di2rer','2d1lead','2d1li2e','3do5word','dren1a5l','drif2t1a','d1ri3pleg5','drom3e5d','d3tab','du2al_','du1op1o1l','ea4n3ies','e3chas','edg1l','ed1uling','eli2t1is','e1loa','en1dix','eo3grap','1e6p3i3neph1','e2r3i4an_','e3spac6i','eth1y6l1ene','5eu2clid1','feb1rua','fermi1o','3fich','fit5ted_','fla1g6el','flow2er_','3fluor','gen2cy_','ge3o1d','ght1we','g1lead','get2ic_','4g1lish','5glo5bin','1g2nac','gnet1ism','gno5mo','g2n1or_','g2noresp','2g1o4n3i1za','graph5er_','griev1','g1utan','hair1s','ha2p3ar5r','hatch1','hex2a3','hite3sid','h3i5pel1a4','hnau3z','ho6r1ic_','h2t1eou','hypo1tha','id4ios','ifac1et','ign4it','ignit1er','i4jk','im3ped3a','infra1s2','i5nitely_','irre6v3oc','i1tesima','ith5i2l','itin5er5ar','janu3a','japan1e2s','je1re1m','1ke6ling','1ki5netic','1kovian','k3sha','la4c3i5e','lai6n3ess','lar5ce1n','l3chai','l3chil6d1','lead6er_','lea4s1a','1lec3ta6b','le3g6en2dre','1le1noid','lith1o5g','ll1fl','l2l3ish','l5mo3nell','lo1bot1o1','lo2ges_','load4ed_','load6er_','l3tea','lth5i2ly','lue1p','1lunk3er','1lum5bia_','3lyg1a1mi','ly5styr','ma1la1p','m2an_','man3u1sc','mar1gin1','medi2c','med3i3cin','medio6c1','me3gran3','m2en_','3mi3da5b','3milita','mil2l1ag','mil5li5li','mi6n3is_','mi1n2ut1er','mi1n2ut1est','m3ma1b','5maph1ro1','5moc1ra1t','mo5e2las','mol1e5c','mon4ey1l','mono3ch','mo4no1en','moro6n5is','mono1s6','moth4et2','m1ou3sin','m5shack2','mu2dro','mul2ti5u','n3ar4chs_','n3ch2es1t','ne3back','2ne1ski','n1dieck','nd3thr','nfi6n3ites','4n5i4an_','nge5nes','ng1ho','ng1spr','nk3rup','n5less','5noc3er1os','nom1a6l','nom5e1no','n1o1mist','non1eq','non1i4so','5nop1oly_','no1vemb','ns5ceiv','ns4moo','ntre1p','obli2g1','o3chas','odel3li','odit1ic','oerst2','oke1st','o3les3ter','oli3gop1o1','o1lo3n4om','o3mecha6','onom1ic','o3norma','o3no2t1o3n','o3nou','op1ism_','or4tho3ni4t','orth1ri','or5tively','o4s3pher','o5test1er','o5tes3tor','oth3e1o1s','ou3ba3do','o6v3i4an_','oxi6d1ic','pal6mat','parag6ra4','par4a1le','param4','para3me','pee2v1','phi2l3ant','phi5lat1e3l','pi2c1a3d','pli2c1ab','pli5nar','poin3ca','1pole_','poly1e','po3lyph1ono','1prema3c','pre1neu','pres2pli','pro2cess','proc3i3ty_','pro2g1e','3pseu2d','pseu3d6o3d2','pseu3d6o3f2','pto3mat4','p5trol3','pu5bes5c','quain2t1e','qu6a3si3','quasir6','quasis6','quin5tes5s','qui3v4ar','r1abolic','3rab1o1loi','ra3chu','r3a3dig','radi1o6g','r2amen','3ra4m5e1triz','ra3mou','ra5n2has','ra1or','r3bin1ge','re2c3i1pr','rec5t6ang','re4t1ribu','r3ial_','riv1o1l','6rk_','rk1ho','r1krau','6rks_','r5le5qu','ro1bot1','ro5e2las','ro5epide1','ro3mesh','ro1tron','r3pau5li','rse1rad1i','r1thou','r1treu','r1veil','rz1sc','sales3c','sales5w','5sa3par5il','sca6p1er','sca2t1ol','s4chitz','schro1ding1','1sci2utt','scrap4er_','scy4th1','sem1a1ph','se3mes1t','se1mi6t5ic','sep3temb','shoe1st','sid2ed_','side5st','side5sw','si5resid','sky1sc','3slova1kia','3s2og1a1my','so2lute','3s2pace','1s2pacin','spe3cio','spher1o','spi2c1il','spokes5w','sports3c','sports3w','s3qui3to','s2s1a3chu1','ss3hat','s2s3i4an_','s5sign5a3b','1s2tamp','s2t1ant5shi','star3tli','sta1ti','st5b','1stor1ab','strat1a1g','strib5ut','st5scr','stu1pi4d1','styl1is','su2per1e6','1sync','1syth3i2','swimm6','5tab1o1lism','ta3gon_','talk1a5','t1a1min','t6ap6ath','5tar2rh','tch1c','tch3i1er','t1cr','teach4er_','tele2g','tele1r6o','3ter1gei','ter2ic_','t3ess2es','tha4l1am','tho3don','th1o5gen1i','tho1k2er','thy4l1an','thy3sc','2t3i4an_','ti2n3o1m','t1li2er','tolo2gy','tot3ic','trai3tor1','tra1vers','travers3a3b','treach1e','tr4ial_','3tro1le1um','trof4ic_','tro3fit','tro1p2is','3trop1o5les','3trop1o5lis','t1ro1pol3it','tsch3ie','ttrib1ut1','turn3ar','t1wh','ty2p5al','ua3drati','uad1ratu','u5do3ny','uea1m','u2r1al_','uri4al_','us2er_','v1ativ','v1oir5du1','va6guer','vaude3v','1verely_','v1er1eig','ves1tite','vi1vip3a3r','voice1p','waste3w6a2','wave1g4','w3c','week1n','wide5sp','wo4k1en','wrap3aro','writ6er_','x1q','xquis3','y5che3d','ym5e5try','y1stro','yes5ter1y','z3ian_','z3o1phr','z2z3w'};
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%hKuikenPatterns
-function tree = hMakeTree(pats)
+function trie = hMakeTrie(pats)
 %
-tree = struct();
+trie = struct();
 %
 for k = 1:numel(pats)
     str = regexprep(pats{k},'[0-9]','');
     spl = regexp(pats{k},'[_a-z]','split');
     spl(cellfun('isempty',spl)) = {'0'};
-    tree = hRecursive(tree,str,str2double(spl));
+    trie = hRecursive(trie,str,str2double(spl));
 end
 
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%hMakeTree
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%hMakeTrie
 function t = hRecursive(t,str,vec)
 if isempty(str)
     t.('P') = vec;
