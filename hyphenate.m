@@ -66,7 +66,7 @@ if isempty(trie)
 	trie = hMakeTrie(horzcat(hLiangPatterns(),hKuikenPatterns()));
 end
 %
-[word,isg] = hStr2Char(word);
+[word,isg] = h1s2c(word);
 %
 assert(ischar(word)&&ndims(word)<3&&size(word,1)==1,...
 	'SC:hyphenate:word:NotText',...
@@ -119,18 +119,14 @@ end
 %
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%hyphenate
-function [txt,isg] = hStr2Char(txt)
-% If scalar string extract the character vector, otherwise data unchanged.
-try
-	isg = isstring(txt); % ISSTRING introduced R2016b.
-catch
-	isg = false;
-end
-if isg && isscalar(txt)
-	txt = txt{1};
+function [arr,isg] = h1s2c(arr)
+% If scalar string then extract the character vector, otherwise data is unchanged.
+isg = isa(arr,'string');
+if isg && isscalar(arr);
+	arr = arr{1};
 end
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%hStr2Char
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%h1s2c
 function ptc = hLiangPatterns()
 % Knuth and Liang's original hyphenation patterns from classic TeX.
 % This list is in the public domain.
