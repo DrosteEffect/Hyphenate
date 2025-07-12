@@ -1,8 +1,12 @@
 function hyphenate_test
 % Test function for the function HYPHENATE.
 %
-% (c) 2017-2023 Stephen Cobeldick
-
+% (c) 2017-2025 Stephen Cobeldick
+%
+%%% Dependencies:
+% hyphenate.m <www.mathworks.com/matlabcentral/fileexchange/61882>
+%
+% See Also: HYPHENATE
 cnt = 0;
 itr = 0;
 if feature('hotlinks')

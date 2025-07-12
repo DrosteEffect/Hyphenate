@@ -1,7 +1,7 @@
 function parts = hyphenate(word) %#ok<*ISMAT>
 % Franklin Liang's word hyphenation algorithm (used by Knuth for TeX/LaTeX).
 %
-% (c) 2017-2024 Stephen Cobeldick
+% (c) 2017-2025 Stephen Cobeldick
 %
 %%% Syntax:
 % parts = hyphenate(word)
@@ -10,6 +10,9 @@ function parts = hyphenate(word) %#ok<*ISMAT>
 % word and returns an array of the parts that can be separated by hyphens.
 % HYPHENATE uses US English hyphenation patterns (see "Information" below),
 % but the code is easy to modify to use whatever patterns you want.
+%
+%%% Dependencies:
+% None
 %
 %% Examples %%
 %
@@ -181,7 +184,7 @@ end
 %
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%hRecursive
-% Copyright (c) 2017-2024 Stephen Cobeldick
+% Copyright (c) 2017-2025 Stephen Cobeldick
 %
 % Licensed under the Apache License, Version 2.0 (the "License");
 % you may not use this file except in compliance with the License.
