@@ -1,32 +1,28 @@
 function parts = hyphenate(word) %#ok<*ISMAT>
 % Franklin Liang's word hyphenation algorithm (used by Knuth for TeX/LaTeX).
 %
-% (c) 2017-2025 Stephen Cobeldick
-%
-%%% Syntax:
-% parts = hyphenate(word)
-%
 % HYPHENATE provides a function to hyphenate words. HYPHENATE takes the
 % word and returns an array of the parts that can be separated by hyphens.
-% HYPHENATE uses US English hyphenation patterns (see "Information" below),
+% HYPHENATE uses US-English hyphenation patterns (see "Information" below),
 % but the code is easy to modify to use whatever patterns you want.
 %
-%%% Dependencies:
-% None
+%%% Syntax %%%
+%
+%   parts = hyphenate(word)
 %
 %% Examples %%
 %
-% >> hyphenate("hyphenation")
-% ans =
-%    "hy"    "phen"    "a"    "tion"
+%   >> hyphenate("hyphenation")
+%   ans =
+%      "hy"    "phen"    "a"    "tion"
 %
-% >> hyphenate('supercalifragilisticexpialidocious')
-% ans =
-%    'su'    'per'    'cal'    'ifrag'    'ilis'    'tic'    'ex'    'pi'    'ali'    'do'    'cious'
+%   >> hyphenate('supercalifragilisticexpialidocious')
+%   ans =
+%      'su'    'per'    'cal'    'ifrag'    'ilis'    'tic'    'ex'    'pi'    'ali'    'do'    'cious'
 %
-% >> hyphenate('project')
-% ans =
-%    'project'
+%   >> hyphenate('project')
+%   ans =
+%      'project'
 %
 %% Information %%
 %
@@ -43,19 +39,22 @@ function parts = hyphenate(word) %#ok<*ISMAT>
 % This function was inspired by Ned Batchelder's Python version:
 % <https://nedbatchelder.com/code/modules/hyphenate.html>
 %
-%% Input and Output Arguments %%
+%% Input Arguments %%
 %
-%%% Input:
-% word = CharVector or StringScalar, the word to hyphenate.
+%   word = CharVector or StringScalar, the word to hyphenate.
 %
-%%% Output:
-% parts = The input <word> split into its hyphenatable parts.
-%         If <word> is a string then <parts> is a string array,
-%         otherwise <parts> is cell of character vectors.
+%% Output Arguments %%
+%
+%   parts = The input <word> split into its hyphenatable parts.
+%           If <word> is a string then <parts> is a string array,
+%           otherwise <parts> is cell of character vectors.
+%
+%% Dependencies %%
+%
+% None
 %
 % See Also CHAR CELLSTR STRING FPRINTF SPRINTF TEXT TITLE
 % REGEXP IREGEXP ARBSORT ISSTRPROP CONTAINS PATTERN
-
 persistent exs exw trie
 %
 if isempty(trie)

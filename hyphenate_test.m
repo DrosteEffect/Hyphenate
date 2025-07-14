@@ -3,10 +3,11 @@ function hyphenate_test
 %
 % (c) 2017-2025 Stephen Cobeldick
 %
-%%% Dependencies:
+%% Dependencies %%
+%
 % hyphenate.m <www.mathworks.com/matlabcentral/fileexchange/61882>
 %
-% See Also: HYPHENATE
+% See Also HYPHENATE
 cnt = 0;
 itr = 0;
 if feature('hotlinks')
