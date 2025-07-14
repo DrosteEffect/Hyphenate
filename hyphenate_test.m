@@ -5,9 +5,10 @@ function hyphenate_test
 %
 %% Dependencies %%
 %
-% hyphenate.m <www.mathworks.com/matlabcentral/fileexchange/61882>
+% * MATLAB R2009a or later.
+% * hyphenate.m <www.mathworks.com/matlabcentral/fileexchange/61882>
 %
-% See Also HYPHENATE
+% See also HYPHENATE
 cnt = 0;
 itr = 0;
 if feature('hotlinks')

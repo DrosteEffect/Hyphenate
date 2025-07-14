@@ -51,9 +51,9 @@ function parts = hyphenate(word) %#ok<*ISMAT>
 %
 %% Dependencies %%
 %
-% None
+% * MATLAB R2009a or later.
 %
-% See Also CHAR CELLSTR STRING FPRINTF SPRINTF TEXT TITLE
+% See also CHAR CELLSTR STRING FPRINTF SPRINTF TEXT TITLE
 % REGEXP IREGEXP ARBSORT ISSTRPROP CONTAINS PATTERN
 persistent exs exw trie
 %
