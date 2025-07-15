@@ -1,4 +1,4 @@
-function parts = hyphenate(word) %#ok<*ISMAT>
+function parts = hyphenate(word)
 % Franklin Liang's word hyphenation algorithm (used by Knuth for TeX/LaTeX).
 %
 % HYPHENATE provides a function to hyphenate words. HYPHENATE takes the
@@ -80,7 +80,7 @@ end
 %
 assert(ischar(word) && ndims(word)<3 && size(word,1)<2,...
 	'SC:hyphenate:word:NotText',...
-	'First input <word> must be a string scalar or a 1xN character vector.')
+	'First input <word> must be a string scalar or a 1xN character vector.') %#ok<ISMAT>
 assert(all(isstrprop(word,'alpha')),...
 	'SC:hyphenate:word:NotAlphabetic',...
 	'First input <word> must contain only alphabetic characters.')
