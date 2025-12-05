@@ -21,3 +21,10 @@ HYPHENATE provides a function to hyphenate words. HYPHENATE takes the word, and 
     >> hyphenate('project')
     ans =
         'project'
+    
+    >> hyphenate('lemma') % default lhm=2 rhm=3
+    ans =
+       'lemma'
+    >> hyphenate('lemma',2,2)
+    ans =
+       'lem'   'ma'
