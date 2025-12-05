@@ -34,14 +34,13 @@ chk('',{''})
 chk("","")
 chk('a':'z', {'abcde','fghijklmnopqrstu','vwxyz'})
 %
-%% TESTHYPHENS.TEX %%
-%
-% \documentclass{article}
-% \usepackage{hyphsubst}
-% \HyphSubstLet{english}{usenglishmax}
-% \usepackage{testhyphens}
+%% Internet Examples %%
 %
 %%% <https://ctan.org/pkg/testhyphens>
+%\documentclass{article}
+%\usepackage{hyphsubst}
+%\HyphSubstLet{english}{usenglishmax}
+%\usepackage{testhyphens}
 chk('manifests',{'man','i','fests'})
 chk('instruments',{'in','stru','ments'})
 chk('he',{'he'})
@@ -58,15 +57,31 @@ chk('federal',{'fed','eral'})
 chk('office',{'of','fice'})
 %
 %%% <https://tex.stackexchange.com/questions/634643/how-to-use-the-usenglishmax-hyphenation-patterns-from-hyph-utf8-pdflatex-te>
-
+%\usepackage{hyphsubst}
+%\HyphSubstLet{english}{usenglishmax}
+%\input{ushyphex}
+%\usepackage{testhyphens}
+chk('academy',0,0,{'acad','e','my'})
+chk('academies',0,0,{'acad','e','mies'})
+chk('accusative',0,0,{'ac','cu','sa','tive'})
+chk('acronym',0,0,{'acro','nym'})
+chk('acronyms',0,0,{'acro','nyms'})
+chk('acupuncture',0,0,{'acu','punc','ture'})
+chk('acupuncturist',0,0,{'acu','punc','tur','ist'})
+chk('adamant',0,0,{'ad','a','mant'})
+chk('addable',0,0,{'add','a','ble'})
+chk('addible',0,0,{'add','i','ble'})
+chk('algebraically',0,0,{'al','ge','bra','i','cal','ly'})
+chk('antiderivative',0,0,{'anti','deriv','a','tive'})
 %
 %% Print Summary %%
 %
 fprintf(' %d of %d testcases failed.\n',cnt,itr)
 %
-	function chk(inA,xpA)
+	function chk(varargin)
 		%
-		opA = hyphenate(inA);
+		xpA = varargin{end};
+		opA = hyphenate(varargin{1:end-1});
 		boo = false;
 		%
 		if ~isequal(class(opA),class(xpA))
