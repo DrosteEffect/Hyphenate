@@ -1,4 +1,4 @@
-function parts = hyphenate(word)
+function parts = hyphenate(word,lhm,rhm)
 % Franklin Liang's word hyphenation algorithm (used by Knuth for TeX/LaTeX).
 %
 % HYPHENATE provides a function to hyphenate words. HYPHENATE takes the
@@ -9,6 +9,7 @@ function parts = hyphenate(word)
 %%% Syntax %%%
 %
 %   parts = hyphenate(word)
+%   parts = hyphenate(word,lhm,rhm)
 %
 %% Examples %%
 %
@@ -23,6 +24,13 @@ function parts = hyphenate(word)
 %   >> hyphenate('project')
 %   ans =
 %      'project'
+%
+%   >> hyphenate('lemma') % default lhm=2 rhm=3
+%   ans =
+%      'lemma'
+%   >> hyphenate('lemma',2,2)
+%   ans =
+%      'lem'   'ma'
 %
 %% Information %%
 %
@@ -42,6 +50,8 @@ function parts = hyphenate(word)
 %% Input Arguments %%
 %
 %   word = CharVector or StringScalar, the word to hyphenate.
+%    lhm = ScalarNumeric, the TeX parameter  \lefthyphenmin, default=2.
+%    rhm = ScalarNumeric, the TeX parameter \righthyphenmin, default=3.
 %
 %% Output Arguments %%
 %
@@ -51,11 +61,43 @@ function parts = hyphenate(word)
 %
 %% Dependencies %%
 %
-% * MATLAB R2009a or later.
+% * MATLAB R2009b or later.
 %
 % See also CHAR CELLSTR STRING FPRINTF SPRINTF TEXT TITLE
 % REGEXP IREGEXP ARBSORT ISSTRPROP CONTAINS PATTERN
 persistent exs exw trie
+%% Input Wrangling %%
+%
+[word,iss] = h1s2c(word);
+assert(ischar(word) && ndims(word)<3 && size(word,1)<2,...
+	'SC:hyphenate:word:NotText',...
+	'1st input <word> must be a string scalar or a 1xN character vector.') %#ok<ISMAT>
+assert(all(isstrprop(word,'alpha')),...
+	'SC:hyphenate:word:NotAlphabetic',...
+	'1st input <word> must contain only alphabetic characters.')
+%
+if nargin<2
+	lhm = 2; % US english default = 2
+else
+	assert(isnumeric(lhm)&&isscalar(lhm)&&isreal(lhm),...
+		'SC:hyphenate:lhm:NotRealScalarNumeric',...
+		'2nd input <lhm> must be a real scalar numeric.')
+	assert(lhm>=0 && fix(lhm)==lhm,...
+		'SC:hyphenate:lhm:NotWholePositive',...
+		'2nd input <lhm> must be a non-negative whole number.')
+end
+if nargin<3
+	rhm = 3; % US english default = 3
+else
+	assert(isnumeric(rhm)&&isscalar(rhm)&&isreal(rhm),...
+		'SC:hyphenate:rhm:NotRealScalarNumeric',...
+		'3rd input <rhm> must be a real scalar numeric.')
+	assert(rhm>=0 && fix(rhm)==rhm,...
+		'SC:hyphenate:rhm:NotWholePositive',...
+		'3rd input <rhm> must be a non-negative whole number.')
+end
+%
+%% Generate Trie %%
 %
 if isempty(trie)
 	% Add your own exceptions here:
@@ -73,32 +115,26 @@ if isempty(trie)
 	exw = exw(idu);
 	exs = exs(idu);
 	% Build hyphenation patterns trie:
-	trie = hMakeTrie(horzcat(hLiangPatterns(),hKuikenPatterns()));
+	trie = hMakeTrie([hLiangPatterns(),hKuikenPatterns()]);
 end
 %
-[word,iss] = h1s2c(word);
-%
-assert(ischar(word) && ndims(word)<3 && size(word,1)<2,...
-	'SC:hyphenate:word:NotText',...
-	'First input <word> must be a string scalar or a 1xN character vector.') %#ok<ISMAT>
-assert(all(isstrprop(word,'alpha')),...
-	'SC:hyphenate:word:NotAlphabetic',...
-	'First input <word> must contain only alphabetic characters.')
+%% Parse Word %%
 %
 idx = strcmpi(word,exw);
+wrk = sprintf('_%s_',lower(word));
+pts = zeros(1,1+numel(wrk));
 %
-if numel(word)<5
-	parts = {word};
-elseif any(idx)
-	parts = mat2cell(word,1,cellfun('length',exs{idx}));
-else
-	wrk = sprintf('_%s_',lower(word));
-	pts = zeros(1,1+numel(wrk));
-	%
+if any(idx) % exception
+	sgl = cellfun('length',exs{idx});
+	if numel(sgl)>1
+		pos = cumsum(sgl);
+		pts(2+pos(1:end-1)) = 1;
+	end
+else % pattern
 	for ii = 1:numel(wrk)
 		t = trie;
 		for c = wrk(ii:end)
-			fld = sprintf('CHAR%s',c);
+			fld = sprintf('U%06X',double(c));
 			if isfield(t,fld)
 				t = t.(fld);
 				if isfield(t,'POINTS')
@@ -111,15 +147,16 @@ else
 			end
 		end
 	end
-	pts([1:3,end-2:end]) = 0;
-	parts = {''};
-	for idy = 1:numel(word)
-		c = word(idy);
-		p = pts(2+idy);
-		parts{end}(end+1) = c;
-		if mod(p,2)
-			parts(end+1) = {''}; %#ok<AGROW>
-		end
+end
+%
+pts(1:min(1+lhm,end)) = 0;
+pts(max(1,end-rhm):end) = 0;
+%
+parts = {''};
+for idy = 1:numel(word)
+	parts{end}(end+1) = word(idy);
+	if mod(pts(2+idy),2)
+		parts{end+1} = ''; %#ok<AGROW>
 	end
 end
 %
@@ -161,8 +198,8 @@ function trie = hMakeTrie(pats)
 trie = struct();
 %
 for k = 1:numel(pats)
-	str = regexprep(pats{k},'[0-9]','');
-	spl = regexp(pats{k},'[_a-z]','split');
+	str = regexprep(pats{k},'\d+',''); % remove digits
+	spl = regexp(pats{k},'\D','split'); % split on any non-digit
 	spl(cellfun('isempty',spl)) = {'0'};
 	trie = hRecursive(trie,str,str2double(spl));
 end
@@ -174,7 +211,7 @@ function t = hRecursive(t,str,vec)
 if isempty(str)
 	t.('POINTS') = vec;
 else
-	fld = sprintf('CHAR%s',str(1));
+	fld = sprintf('U%06X',double(str(1)));
 	if ~isfield(t,fld)
 		t.(fld) = struct();
 	end
@@ -183,16 +220,11 @@ end
 %
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%hRecursive
-% Copyright (c) 2017-2025 Stephen Cobeldick
+% Copyright (c) 2017-2026 Stephen Cobeldick
 %
-% Licensed under the Apache License, Version 2.0 (the "License");
-% you may not use this file except in compliance with the License.
-% You may obtain a copy of the License at
+% Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 %
-% http://www.apache.org/licenses/LICENSE-2.0
+% The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 %
-% Unless required by applicable law or agreed to in writing, software
-% distributed under the License is distributed on an "AS IS" BASIS,
-% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-% See the License for the specific language governing permissions and limitations under the License.
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%license
