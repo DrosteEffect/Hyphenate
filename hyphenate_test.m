@@ -106,7 +106,7 @@ fprintf(' %d of %d testcases failed.\n',cnt,itr)
 			fprintf('\n')
 			fprintf('actual: %s\n', opT);
 			fprintf('expect: %s\n', xpT);
-			fprintf('diff:   ')
+			fprintf('     \x394: ')
 			fprintf(2,'%s\n',erT); % red!
 		end
 		cnt = cnt+boo;
