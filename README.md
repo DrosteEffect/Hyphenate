@@ -4,9 +4,7 @@ Hyphenate
 [![View Hyphenate on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/61882)
 [![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=DrosteEffect/Hyphenate)
 
-Word hyphenation using Franklin Mark Liang's algorithm (aka Knuth-Liang algorithm). As used by Knuth in TeX and LaTeX.
-
-HYPHENATE provides a function to hyphenate words. HYPHENATE takes the word, and returns the parts that can be separated by hyphens.
+Word hyphenation using Franklin Mark Liang's algorithm (aka Knuth-Liang algorithm), as used by Knuth in TeX and LaTeX. HYPHENATE takes the word, and returns the parts that can be separated by hyphens.
 
 This MATLAB function was inspired by Ned Batchelder's Python implementation: <https://nedbatchelder.com/code/modules/hyphenate.html>
 
@@ -31,7 +29,7 @@ This MATLAB function was inspired by Ned Batchelder's Python implementation: <ht
     ans =
        'lem'   'ma'
 
-## How It Works ##
+### How It Works ###
 
 The algorithm works by checking thousands of patterns like `hy3ph` and `a5diu`. Each pattern contains letters and numbers, where the numbers indicate priority levels for hyphenation at each position: odd numbers allow hyphenation while even numbers suppress hyphenation. Higher numbers represent stronger confidence in the rule.
 
@@ -41,10 +39,16 @@ The patterns are stored in a [*trie* data structure](https://en.wikipedia.org/wi
 
 Some words have hard-coded exceptions that override the pattern matching, either because their hyphenation breaks the general rules or because they fall into edge cases where multiple valid patterns conflict.
 
-## Patterns and Exceptions ##
+### Patterns and Exceptions ###
 
 The patterns come from classic TeX (Knuth and Liang's original work) plus enhancements by Gerard Kuiken based on hyphenation corrections published through 2005, obtained from the [`ushyph` package](https://ctan.org/pkg/ushyph) (USHYPHMAX.TEX).
 
 The exceptions come from Ned Batchelder (2007) and Barbara Beeton et al (2021), obtained from the [`hyphenex` package](https://ctan.org/pkg/hyphenex) (USHYPHEX.TEX).
 
 These are commonly used by TeX and LaTeX when typesetting US English documents.
+
+### Note ###
+
+I just ported this algorithm to MATLAB, but am not responsible for it deciding _where_ it splits words.
+
+The algorithm does not provide _all_ possible hyphenation points for all words. The algorithm provides most correct hyphenation points without providing any incorrect ones, i.e. HYPHENATE returns a subset of the correct hyphenation points.
