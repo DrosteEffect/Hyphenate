@@ -122,7 +122,8 @@ end
 %
 idx = strcmpi(word,exw);
 wrk = sprintf('_%s_',lower(word));
-pts = zeros(1,1+numel(wrk));
+pts = zeros(1,1+numel(wrk)); % note: PTS aligns with positions between
+% the characters or WRK, i.e. PTS(k) is boundary before WRK(k-1). 
 %
 if any(idx) % exception
 	sgl = cellfun('length',exs{idx});
@@ -132,15 +133,16 @@ if any(idx) % exception
 	end
 else % pattern
 	for ii = 1:numel(wrk)
-		t = trie;
-		for c = wrk(ii:end)
-			fld = sprintf('U%06X',double(c));
-			if isfield(t,fld)
-				t = t.(fld);
-				if isfield(t,'POINTS')
-					p = t.('POINTS');
-					idv = ii+(0:numel(p)-1);
-					pts(idv) = max(pts(idv),p);
+		tt = trie;
+		for jj = ii:numel(wrk)
+			c1 = wrk(jj);
+			fn = sprintf('U%06X',double(c1));
+			if isfield(tt,fn)
+				tt = tt.(fn);
+				if isfield(tt,'POINTS')
+					pt = tt.('POINTS');
+					ix = ii+(0:numel(pt)-1);
+					pts(ix) = max(pts(ix),pt);
 				end
 			else
 				break
@@ -153,9 +155,9 @@ pts(1:min(1+lhm,end)) = 0;
 pts(max(1,end-rhm):end) = 0;
 %
 parts = {''};
-for idy = 1:numel(word)
-	parts{end}(end+1) = word(idy);
-	if mod(pts(2+idy),2)
+for kk = 1:numel(word)
+	parts{end}(end+1) = word(kk);
+	if mod(pts(2+kk),2)
 		parts{end+1} = ''; %#ok<AGROW>
 	end
 end
@@ -206,16 +208,16 @@ end
 %
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%hMakeTrie
-function t = hRecursive(t,str,vec)
+function trie = hRecursive(trie,str,vec)
 %
 if isempty(str)
-	t.('POINTS') = vec;
+	trie.('POINTS') = vec;
 else
-	fld = sprintf('U%06X',double(str(1)));
-	if ~isfield(t,fld)
-		t.(fld) = struct();
+	fn = sprintf('U%06X',double(str(1)));
+	if ~isfield(trie,fn)
+		trie.(fn) = struct();
 	end
-	t.(fld) = hRecursive(t.(fld),str(2:end),vec);
+	trie.(fn) = hRecursive(trie.(fn),str(2:end),vec);
 end
 %
 end
